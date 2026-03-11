@@ -212,6 +212,8 @@ To authenticate CI with AWS, use OIDC (no stored long-lived keys):
 2. Create an IAM role with trust policy for your repo
 3. Add the role ARN as a GitHub secret: `AWS_CI_ROLE_ARN`
 
+See `doc/ENVIRONMENT_SETUP.md` for the exact commands to run.
+
 ---
 
 ## Step 7 — GitHub Actions Deploy Pipeline
