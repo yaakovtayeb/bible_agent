@@ -32,7 +32,7 @@ agents:
     bedrock_agentcore:
       agent_id: BiblicalNewsAgent_CloudWatch-b5yBJCH5Fu
       agent_arn: arn:aws:bedrock-agentcore:us-east-1:923154133870:runtime/BiblicalNewsAgent_CloudWatch-b5yBJCH5Fu
-      agent_session_id: null
+      agent_session_id: 261a19be-3957-438f-a186-cefac737d209
     codebuild:
       project_name: null
       execution_role: null

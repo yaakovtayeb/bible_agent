@@ -38,7 +38,10 @@ jobs:
           aws-region: us-east-1
 
       - name: Deploy agent
-        run: agentcore deploy --auto-update-on-conflict
+        run: |
+          agentcore deploy --auto-update-on-conflict \
+            --env MODEL_ID=${{ secrets.MODEL_ID }} \
+            --env MEMORY_ID=${{ secrets.MEMORY_ID }}
 
       - name: Smoke test
         run: |

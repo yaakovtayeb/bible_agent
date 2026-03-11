@@ -204,6 +204,28 @@ aws iam put-role-policy \
 Output: `arn:aws:iam::<ACCOUNT_ID>:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1`
 -> Used in Step 7 as `--execution-role`
 
+Also add the memory permissions policy (required for the agent to read/write memory at runtime):
+
+```bash
+aws iam put-role-policy \
+  --role-name AmazonBedrockAgentCoreSDKRuntime-us-east-1 \
+  --policy-name BedrockAgentCoreMemoryPolicy \
+  --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Action": [
+        "bedrock-agentcore:ListEvents",
+        "bedrock-agentcore:CreateEvent",
+        "bedrock-agentcore:GetMemory",
+        "bedrock-agentcore:ListMemories",
+        "bedrock-agentcore:RetrieveMemoryRecords"
+      ],
+      "Resource": "arn:aws:bedrock-agentcore:us-east-1:<ACCOUNT_ID>:memory/*"
+    }]
+  }' --profile <your-profile>
+```
+
 ---
 
 ## Step 7 — Configure and deploy the agent (first time)
@@ -227,7 +249,10 @@ export $(cat .env | xargs) && export AWS_PROFILE=<your-profile> && agentcore con
 # - source_path: .
 
 # Deploy — creates S3 bucket, builds via CodeBuild, creates memory, deploys runtime
-agentcore deploy
+# --env injects MODEL_ID and MEMORY_ID into the runtime so agent.py can read them via os.environ
+agentcore deploy \
+  --env MODEL_ID=$MODEL_ID \
+  --env MEMORY_ID=$MEMORY_ID
 ```
 
 After deploy, read the memory ID:
