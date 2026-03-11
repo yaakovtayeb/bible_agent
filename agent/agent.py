@@ -3,13 +3,16 @@ Biblical News Agent - AgentCore Runtime (CloudWatch Observability)
 User provides news text; agent rewrites it in biblical Hebrew style.
 STM via Strands AgentCoreMemorySessionManager — session/actor swappable per invocation.
 """
+
 import os
 from pathlib import Path
-from strands import Agent
-from strands.models import BedrockModel
-from bedrock_agentcore.runtime import BedrockAgentCoreApp
+
 from bedrock_agentcore.memory.integrations.strands.config import AgentCoreMemoryConfig
 from bedrock_agentcore.memory.integrations.strands.session_manager import AgentCoreMemorySessionManager
+from bedrock_agentcore.runtime import BedrockAgentCoreApp
+from strands import Agent
+from strands.models import BedrockModel
+
 from agent.tools.bible import fetch_local_bible
 
 os.environ["AGENT_OBSERVABILITY_ENABLED"] = "true"
@@ -27,6 +30,7 @@ SYSTEM_PROMPT = SYSTEM_PROMPT.read_text(encoding="utf-8")
 
 
 LOCAL_MODE = os.environ.get("LOCAL_MODE", "false").lower() == "true"
+
 
 @app.entrypoint
 def invoke(payload):

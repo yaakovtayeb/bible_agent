@@ -1,10 +1,10 @@
+import random
 import re
+from pathlib import Path
+
 import requests
 from bs4 import BeautifulSoup
 from strands import tool
-
-import random
-from pathlib import Path
 
 WEIRD_CHARS = str.maketrans({"\xa0": " ", "\u200f": "", "\u200e": ""})
 MARKERS = re.compile(r"\{[פשס]\}")

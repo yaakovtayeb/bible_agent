@@ -2,8 +2,10 @@
 Unit tests for fetch_local_bible.
 All tests use tmp_path to create fake bible files — no real files, no network calls.
 """
+
 from pathlib import Path
 from unittest.mock import patch
+
 import agent.tools.bible as bible_module
 from agent.tools.bible import fetch_local_bible
 
@@ -17,11 +19,14 @@ def make_bible_dir(tmp_path: Path, books: dict) -> Path:
 
 
 def test_returns_text(tmp_path):
-    bible_dir = make_bible_dir(tmp_path, {
-        "בראשית.md": "# בראשית\nבְּרֵאשִׁית בָּרָא אֱלֹהִים",
-        "שמות.md": "# שמות\nוְאֵלֶּה שְׁמוֹת",
-        "ויקרא.md": "# ויקרא\nוַיִּקְרָא אֶל מֹשֶׁה",
-    })
+    bible_dir = make_bible_dir(
+        tmp_path,
+        {
+            "בראשית.md": "# בראשית\nבְּרֵאשִׁית בָּרָא אֱלֹהִים",
+            "שמות.md": "# שמות\nוְאֵלֶּה שְׁמוֹת",
+            "ויקרא.md": "# ויקרא\nוַיִּקְרָא אֶל מֹשֶׁה",
+        },
+    )
     with patch.object(bible_module, "BIBLE_DIR", bible_dir):
         result = fetch_local_bible()
     assert isinstance(result, str)
@@ -29,9 +34,7 @@ def test_returns_text(tmp_path):
 
 
 def test_truncates_to_3000(tmp_path):
-    bible_dir = make_bible_dir(tmp_path, {
-        f"book{i}.md": "א" * 2000 for i in range(3)
-    })
+    bible_dir = make_bible_dir(tmp_path, {f"book{i}.md": "א" * 2000 for i in range(3)})
     with patch.object(bible_module, "BIBLE_DIR", bible_dir):
         result = fetch_local_bible()
     assert len(result) <= 3000
