@@ -51,11 +51,14 @@ jobs:
         run: |
           agentcore invoke '{"news": "ממשלת ישראל אישרה תקציב חדש", "actor_id": "smoke-test", "session_id": "smoke-1"}' > /tmp/invoke_output.txt 2>&1
           cat /tmp/invoke_output.txt
-          # Extract the JSON line (starts with '{')
-          JSON=$(grep '^{' /tmp/invoke_output.txt | tail -1)
-          echo "$JSON" | python -c "
-          import sys, json
-          data = json.load(sys.stdin)
+          python -c "
+          import json, re
+          output = open('/tmp/invoke_output.txt').read()
+          # agentcore invoke prints 'Response:\n<json>' — extract everything after 'Response:'
+          match = re.search(r'Response:\s*(\{.*)', output, re.DOTALL)
+          assert match, 'No Response JSON found in output'
+          raw = match.group(1).strip()
+          data = json.loads(raw, strict=False)
           assert 'result' in data, f'Missing result key: {data}'
           assert len(data['result']) > 0, 'Empty result'
           print('Smoke test passed')
