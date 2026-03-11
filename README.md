@@ -1,4 +1,4 @@
-# Biblical News Agent
+# Biblical News Agent V1.0
 
 An AWS Bedrock AgentCore agent that rewrites modern news in biblical Hebrew style.
 Built as a learning project for CI/CD pipelines with Bedrock AgentCore.
