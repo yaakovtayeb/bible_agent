@@ -40,6 +40,6 @@ def fetch_local_bible() -> str:
     books = list(BIBLE_DIR.glob("*.md"))
     if not books:
         return "Error: no local bible files found"
-    selected = random.sample(books, min(3, len(books)))
+    selected = random.sample(books, min(3, len(books)))  # nosec B311
     combined = "\n\n".join(f.read_text(encoding="utf-8") for f in selected)
     return combined[:3000]
