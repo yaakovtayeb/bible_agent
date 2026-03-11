@@ -1,0 +1,62 @@
+"""
+Biblical News Agent - AgentCore Runtime (CloudWatch Observability)
+User provides news text; agent rewrites it in biblical Hebrew style.
+STM via Strands AgentCoreMemorySessionManager — session/actor swappable per invocation.
+"""
+import os
+from pathlib import Path
+from strands import Agent
+from strands.models import BedrockModel
+from bedrock_agentcore.runtime import BedrockAgentCoreApp
+from bedrock_agentcore.memory.integrations.strands.config import AgentCoreMemoryConfig
+from bedrock_agentcore.memory.integrations.strands.session_manager import AgentCoreMemorySessionManager
+from agent.tools.bible import fetch_bible_text
+
+os.environ["AGENT_OBSERVABILITY_ENABLED"] = "true"
+
+MODEL_ID = os.environ["MODEL_ID"]
+MEMORY_ID = os.environ["MEMORY_ID"]
+REGION = os.environ.get("AWS_REGION", "us-east-1")
+
+app = BedrockAgentCoreApp()
+model = BedrockModel(model_id=MODEL_ID)
+
+SYSTEM_PROMPT = Path(__file__).parent / "prompts" / "system_prompt.txt"
+SYSTEM_PROMPT = SYSTEM_PROMPT.read_text(encoding="utf-8")
+
+
+@app.entrypoint
+def invoke(payload):
+    news_text = payload.get("news", "") if isinstance(payload, dict) else ""
+    actor_id = payload.get("actor_id", "default-user") if isinstance(payload, dict) else "default-user"
+    session_id = payload.get("session_id", "default-session") if isinstance(payload, dict) else "default-session"
+
+    config = AgentCoreMemoryConfig(
+        memory_id=MEMORY_ID,
+        actor_id=actor_id,
+        session_id=session_id,
+    )
+
+    session_manager = AgentCoreMemorySessionManager(
+        agentcore_memory_config=config,
+        region_name=REGION,
+    )
+
+    agent = Agent(
+        model=model,
+        tools=[fetch_bible_text],
+        system_prompt=SYSTEM_PROMPT,
+        session_manager=session_manager,
+    )
+
+    try:
+        response = agent(f"חדשה לשכתוב:\n{news_text}")
+        result_text = response.message["content"][0]["text"]
+    finally:
+        session_manager.close()
+
+    return {"result": result_text, "session_id": session_id, "actor_id": actor_id}
+
+
+if __name__ == "__main__":
+    app.run()

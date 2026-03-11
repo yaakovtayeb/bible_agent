@@ -4,7 +4,7 @@ agents:
     name: BiblicalNewsAgent_CloudWatch
     language: python
     node_version: '20'
-    entrypoint: /Users/ytayeb/Projects/agent1_project/agent1.py
+    entrypoint: /Users/ytayeb/Projects/agent1_project/agent/agent.py
     deployment_type: direct_code_deploy
     runtime_type: PYTHON_3_12
     platform: linux/arm64
