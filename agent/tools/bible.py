@@ -3,9 +3,14 @@ import requests
 from bs4 import BeautifulSoup
 from strands import tool
 
+import random
+from pathlib import Path
+
 WEIRD_CHARS = str.maketrans({"\xa0": " ", "\u200f": "", "\u200e": ""})
 MARKERS = re.compile(r"\{[פשס]\}")
 VERSE_NUMS = re.compile(r"[\u05d0-\u05ea]{1,3},[\u05d0-\u05ea]{1,3}\s*")
+
+BIBLE_DIR = Path(__file__).parent.parent.parent / "resources" / "bible_md"
 
 
 def _clean(text: str) -> str:
@@ -31,13 +36,10 @@ def fetch_bible_text(query: str) -> str:
 
 @tool
 def fetch_local_bible() -> str:
-    """Return up to 10,000 characters from three randomly selected local bible books."""
-    import random
-    from pathlib import Path
-    bible_dir = Path(__file__).parent.parent.parent / "resources" / "bible_md"
-    books = list(bible_dir.glob("*.md"))
+    """Return up to 3,000 characters from three randomly selected local bible books."""
+    books = list(BIBLE_DIR.glob("*.md"))
     if not books:
         return "Error: no local bible files found"
     selected = random.sample(books, min(3, len(books)))
     combined = "\n\n".join(f.read_text(encoding="utf-8") for f in selected)
-    return combined[:10_000]
+    return combined[:3000]

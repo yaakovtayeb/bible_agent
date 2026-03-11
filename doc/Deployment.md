@@ -149,14 +149,14 @@ python-dotenv>=1.0.0
 > a deployment button with no safety net. Unit tests catch bugs before they reach AWS.
 > They run in milliseconds with no real network calls and no cost.
 
-Test `fetch_bible_text` with mocked HTTP.
+Test `fetch_local_bible` with mocked HTTP.
 
 File: `tests/unit/test_tools.py`
 
 Tests to cover:
 - Returns text on successful HTTP response
 - Returns error string on network failure
-- Truncates output to 3000 characters
+- Truncates output to 10_000 characters
 
 Run with:
 
