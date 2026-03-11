@@ -49,10 +49,11 @@ jobs:
 
       - name: Smoke test
         run: |
-          RESPONSE=$(agentcore invoke '{"news": "ממשלת ישראל אישרה תקציב חדש", "actor_id": "smoke-test", "session_id": "smoke-1"}')
-          echo "Response: $RESPONSE"
-          # Fail if response is empty or contains "error"
-          echo "$RESPONSE" | python -c "
+          agentcore invoke '{"news": "ממשלת ישראל אישרה תקציב חדש", "actor_id": "smoke-test", "session_id": "smoke-1"}' > /tmp/invoke_output.txt 2>&1
+          cat /tmp/invoke_output.txt
+          # Extract the JSON line (starts with '{')
+          JSON=$(grep '^{' /tmp/invoke_output.txt | tail -1)
+          echo "$JSON" | python -c "
           import sys, json
           data = json.load(sys.stdin)
           assert 'result' in data, f'Missing result key: {data}'
