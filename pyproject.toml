@@ -1,3 +1,5 @@
+# ruff: fast Python linter and formatter. Replaces flake8 + isort + black.
+# Enforces code style and catches common errors on every commit and in CI.
 [tool.ruff]
 line-length = 120
 target-version = "py312"
@@ -5,13 +7,19 @@ target-version = "py312"
 [tool.ruff.lint]
 select = ["E", "F", "I"]
 
+# mypy: static type checker. Catches type errors before runtime.
+# Runs in CI to ensure type annotations are correct across the codebase.
 [tool.mypy]
 python_version = "3.12"
 ignore_missing_imports = true
 
+# pytest: test runner. Discovers and runs all tests under the tests/ directory.
+# Used locally and in CI to validate every change before merge or deploy.
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 
+# bandit: security linter. Scans agent/ for common vulnerabilities like hardcoded secrets,
+# unsafe subprocess calls, and insecure HTTP usage. Runs in CI as part of the lint job.
 [tool.bandit]
 targets = ["agent"]
 skips = ["B101"]
