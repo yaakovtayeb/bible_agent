@@ -5,7 +5,11 @@ STM via Strands AgentCoreMemorySessionManager — session/actor swappable per in
 """
 
 import os
+import sys
 from pathlib import Path
+
+# When run as a script by AgentCore runtime, the parent dir is not on sys.path
+sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from bedrock_agentcore.memory.integrations.strands.config import AgentCoreMemoryConfig
 from bedrock_agentcore.memory.integrations.strands.session_manager import AgentCoreMemorySessionManager
@@ -27,7 +31,6 @@ model = BedrockModel(model_id=MODEL_ID, max_tokens=MAX_TOKENS)
 
 SYSTEM_PROMPT = Path(__file__).parent / "prompts" / "system_prompt.txt"
 SYSTEM_PROMPT = SYSTEM_PROMPT.read_text(encoding="utf-8")
-
 
 LOCAL_MODE = os.environ.get("LOCAL_MODE", "false").lower() == "true"
 
