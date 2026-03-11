@@ -127,18 +127,81 @@ aws iam put-role-policy \
 
 ---
 
-## 5. Add GitHub secrets
+## 5. Create the Deploy IAM role
 
-Go to: github.com > your repo > Settings > Secrets and variables > Actions
+This role is assumed by GitHub Actions when deploying to Bedrock AgentCore (on merge to main).
+Replace `<ACCOUNT_ID>` and `<GITHUB_USERNAME>/<REPO_NAME>` with your values:
 
-| Secret name | Value |
-|---|---|
-| `AWS_CI_ROLE_ARN` | `arn:aws:iam::<ACCOUNT_ID>:role/GitHubActions-BibleAgent-CI` |
-| `AWS_DEPLOY_ROLE_ARN` | `arn:aws:iam::<ACCOUNT_ID>:role/GitHubActions-BibleAgent-Deploy` (Step 7) |
+```bash
+aws iam create-role \
+  --role-name GitHubActions-BibleAgent-Deploy \
+  --assume-role-policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [{
+      "Effect": "Allow",
+      "Principal": {"Federated": "arn:aws:iam::<ACCOUNT_ID>:oidc-provider/token.actions.githubusercontent.com"},
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com",
+          "token.actions.githubusercontent.com:sub": "repo:<GITHUB_USERNAME>/<REPO_NAME>:ref:refs/heads/main"
+        }
+      }
+    }]
+  }'
+
+aws iam put-role-policy \
+  --role-name GitHubActions-BibleAgent-Deploy \
+  --policy-name BibleAgentDeployPolicy \
+  --policy-document '{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "bedrock:InvokeModel",
+          "bedrock:InvokeModelWithResponseStream",
+          "bedrock-agentcore:CreateAgentRuntime",
+          "bedrock-agentcore:UpdateAgentRuntime",
+          "bedrock-agentcore:GetAgentRuntime",
+          "bedrock-agentcore:ListAgentRuntimes",
+          "bedrock-agentcore:CreateAgentRuntimeEndpoint",
+          "bedrock-agentcore:UpdateAgentRuntimeEndpoint",
+          "bedrock-agentcore:GetAgentRuntimeEndpoint",
+          "bedrock-agentcore:InvokeAgentRuntime",
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:InitiateLayerUpload",
+          "ecr:UploadLayerPart",
+          "ecr:CompleteLayerUpload",
+          "ecr:PutImage",
+          "ecr:CreateRepository",
+          "iam:PassRole"
+        ],
+        "Resource": "*"
+      }
+    ]
+  }'
+```
+
+Note the role ARN from the output — you will need it in the next step.
 
 ---
 
-## 6. Enable branch protection on main
+## 6. Add GitHub secrets
+
+Go to: github.com > your repo > Settings > Secrets and variables > Actions
+
+| Secret name | Value | Used by |
+|---|---|---|
+| `AWS_CI_ROLE_ARN` | `arn:aws:iam::<ACCOUNT_ID>:role/GitHubActions-BibleAgent-CI` | `ci.yml` — lint and unit tests |
+| `AWS_DEPLOY_ROLE_ARN` | `arn:aws:iam::<ACCOUNT_ID>:role/GitHubActions-BibleAgent-Deploy` | `deploy.yml` — deploy on merge to main |
+
+---
+
+## 7. Enable branch protection on main
 
 Go to: github.com > your repo > Settings > Branches > Add rule
 
