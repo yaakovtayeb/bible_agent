@@ -1,0 +1,54 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "agent/**"
+      - "requirements.txt"
+      - ".bedrock_agentcore.yaml"
+
+permissions:
+  id-token: write  # required for OIDC
+  contents: read
+
+jobs:
+  deploy:
+    name: Deploy to AgentCore
+    runs-on: ubuntu-latest
+    env:
+      MODEL_ID: ${{ secrets.MODEL_ID }}
+      MEMORY_ID: ${{ secrets.MEMORY_ID }}
+      AWS_REGION: us-east-1
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE_ARN }}
+          aws-region: us-east-1
+
+      - name: Deploy agent
+        run: agentcore deploy --auto-update-on-conflict
+
+      - name: Smoke test
+        run: |
+          RESPONSE=$(agentcore invoke '{"news": "ממשלת ישראל אישרה תקציב חדש", "actor_id": "smoke-test", "session_id": "smoke-1"}')
+          echo "Response: $RESPONSE"
+          # Fail if response is empty or contains "error"
+          echo "$RESPONSE" | python -c "
+          import sys, json
+          data = json.load(sys.stdin)
+          assert 'result' in data, f'Missing result key: {data}'
+          assert len(data['result']) > 0, 'Empty result'
+          print('Smoke test passed')
+          "

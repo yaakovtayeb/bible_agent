@@ -4,20 +4,20 @@ agents:
     name: BiblicalNewsAgent_CloudWatch
     language: python
     node_version: '20'
-    entrypoint: /Users/ytayeb/Projects/agent1_project/agent/agent.py
+    entrypoint: agent/agent.py
     deployment_type: direct_code_deploy
     runtime_type: PYTHON_3_12
     platform: linux/arm64
     container_runtime: null
-    source_path: /Users/ytayeb/Projects/agent1_project
+    source_path: .
     aws:
-      execution_role: arn:aws:iam::019904893923:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1-090251baad
-      execution_role_auto_create: false
-      account: 923154133870
+      execution_role: arn:aws:iam::923154133870:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1
+      execution_role_auto_create: true
+      account: '923154133870'
       region: us-east-1
       ecr_repository: null
       ecr_auto_create: false
-      s3_path: s3://bedrock-agentcore-codebuild-sources-019904893923-us-east-1
+      s3_path: s3://bedrock-agentcore-codebuild-sources-923154133870-us-east-1
       s3_auto_create: false
       network_configuration:
         network_mode: PUBLIC
@@ -30,21 +30,21 @@ agents:
         idle_runtime_session_timeout: null
         max_lifetime: null
     bedrock_agentcore:
-      agent_id: BiblicalNewsAgent_CloudWatch-fMivaRGToU
-      agent_arn: arn:aws:bedrock-agentcore:us-east-1:019904893923:runtime/BiblicalNewsAgent_CloudWatch-fMivaRGToU
-      agent_session_id: 05e7ab72-872d-4831-a2df-069e4771ff5e
+      agent_id: BiblicalNewsAgent_CloudWatch-b5yBJCH5Fu
+      agent_arn: arn:aws:bedrock-agentcore:us-east-1:923154133870:runtime/BiblicalNewsAgent_CloudWatch-b5yBJCH5Fu
+      agent_session_id: null
     codebuild:
       project_name: null
       execution_role: null
       source_bucket: null
     memory:
-      mode: NO_MEMORY
-      memory_id: null
-      memory_arn: null
-      memory_name: null
+      mode: STM_ONLY
+      memory_id: BiblicalNewsAgent_CloudWatch_mem-Xb1N9sERy3
+      memory_arn: arn:aws:bedrock-agentcore:us-east-1:923154133870:memory/BiblicalNewsAgent_CloudWatch_mem-Xb1N9sERy3
+      memory_name: BiblicalNewsAgent_CloudWatch_mem
       event_expiry_days: 30
-      first_invoke_memory_check_done: false
-      was_created_by_toolkit: false
+      first_invoke_memory_check_done: true
+      was_created_by_toolkit: true
     identity:
       credential_providers: []
       workload: null
