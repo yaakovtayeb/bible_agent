@@ -13,7 +13,7 @@ agents:
     aws:
       execution_role: arn:aws:iam::019904893923:role/AmazonBedrockAgentCoreSDKRuntime-us-east-1-090251baad
       execution_role_auto_create: false
-      account: 019904893923
+      account: 923154133870
       region: us-east-1
       ecr_repository: null
       ecr_auto_create: false
